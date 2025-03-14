@@ -439,3 +439,56 @@ body.light-mode .message.received {
     opacity: 1;
     pointer-events: auto;
   }
+
+.game-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 70%;
+    background: #191970;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #00ffff;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: calc(100% - 50px); /* Space for score */
+}
+
+.score-board {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #00ffff;
+    font-size: 20px;
+    z-index: 10;
+}
+
+.game-over-modal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ffff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.neon-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #00ffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00ffff;
+    z-index: 10;
+}

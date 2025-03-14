@@ -127,18 +127,21 @@
       <!-- Messages and input bar here -->
     </div>
   
-    <!-- New game container -->
-    <div id="game-container" class="game-container" style="display: none;">
-      <canvas id="gameCanvas"></canvas>
-      <div class="score-board">Score: <span id="score">0</span></div>
-      <div class="game-over-modal" id="gameOverModal">
+ <!-- New Game Container -->
+ <div id="game-container" class="game-container" style="display: none;">
+    <button id="exit-game" class="neon-button">← Back to Chat</button>
+    <canvas id="gameCanvas"></canvas>
+    <div class="score-board">Score: <span id="score">0</span></div>
+    <div class="game-over-modal" id="gameOverModal">
         <h2>Game Over!</h2>
         <p>Press "R" to Restart</p>
-      </div>
     </div>
-  </main>
-    <script src="/js/script.js"></script>
-    <script src="/js/account.js"></script>
-</body>
+</div>
+</main>
 
+<!-- Include game scripts -->
+<script src="/games/gamejs/snake.js"></script>
+<!-- Existing scripts -->
+<script src="/js/script.js"></script>
+</body>
 </html>

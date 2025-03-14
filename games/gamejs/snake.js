@@ -15,6 +15,24 @@ let score = 0;
 let gameOver = false;
 let gameLoop;
 
+// Set canvas size responsively
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.75; // 75% of window width
+    canvas.height = window.innerHeight * 0.6; // 60% of window height
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // Initial call
+
+// Rest of your snake code...
+
+// Use requestAnimationFrame for smoother updates
+function gameLoop() {
+    if (!gameOver) {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+}
 // Initialize game
 function init() {
   snake = [{ x: 200, y: 200 }];

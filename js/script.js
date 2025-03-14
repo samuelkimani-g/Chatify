@@ -211,3 +211,24 @@ document.getElementById('game-trigger').addEventListener('click', (e) => {
     loadMessages();
     createParticles();
 });
+// Game Toggle
+document.getElementById('game-trigger').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('chat-area').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    document.querySelector('.input-bar').style.display = 'none'; // Hide chat input
+    initGame(); // Initialize Snake
+});
+
+// Exit Game Button
+document.getElementById('exit-game').addEventListener('click', () => {
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('chat-area').style.display = 'block';
+    document.querySelector('.input-bar').style.display = 'flex'; // Show chat input
+});
+
+// Initialize Game (call this once)
+function initGame() {
+    // Your existing snake game code here
+    // Ensure the game uses the canvas in #game-container
+}

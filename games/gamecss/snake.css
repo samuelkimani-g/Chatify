@@ -93,3 +93,19 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
   }
+  /* Add glowing effects */
+#gameCanvas {
+    background: #191970;
+}
+
+.snake-part {
+    background: #00ffff;
+    border: 1px solid #00ffff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+.food {
+    background: #ff00ff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #ff00ff;
+}

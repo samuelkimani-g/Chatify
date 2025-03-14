@@ -1,43 +1,48 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const admin = require("firebase-admin");
-
-// Initialize Firebase Admin
-const serviceAccount = require(process.env.FIREBASE_CREDENTIALS);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// server.js
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const server = http.createServer(app);
+const io = new Server(server);
 
-// Signup Route
-app.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await admin.auth().createUser({
-      email,
-      password,
-    });
-    res.status(201).json({ message: "User created successfully", user });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+// Serve static files
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/games', express.static(path.join(__dirname, 'games')));
+
+// Serve main HTML file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
-// Login Route
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await admin.auth().getUserByEmail(email);
-    res.status(200).json({ message: "Login successful", uid: user.uid });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+// Socket.IO chat handling
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Handle incoming chat messages
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg); // Broadcast to all clients
+  });
+
+  // Handle game state updates
+  socket.on('game update', (state) => {
+    io.emit('game update', state);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+// Error handling
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', 'html', '404.html'));
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
