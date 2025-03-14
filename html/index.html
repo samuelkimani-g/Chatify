@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatify - Speak Easy, Connect Freely</title>
+    <link rel="stylesheet" href="/css/landingpg.css">
+</head>
+<body>
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        
+        <div class="form-container">
+            <!-- Login Form -->
+            <div id="login-form">
+                <h2>Login to Chatify</h2>
+                <input type="email" placeholder="Email" id="login-email">
+                <input type="password" placeholder="Password" id="login-password">
+                <button id="submit-login" class="submit-btn" onclick="login();">Login</button>
+                <p>Don't have an account? <span id="show-signup" class="toggle-link">Sign Up</span></p>
+            </div>
+
+            <!-- Sign-Up Form (Hidden by Default) -->
+            <div id="signup-form" style="display: none;">
+                <h2>Create an Account</h2>
+                <input type="text" placeholder="Full Name" id="signup-name">
+                <input type="email" placeholder="Email" id="signup-email">
+                <input type="password" placeholder="Password" id="signup-password">
+                <button id="submit-signup" class="submit-btn" onclick="signup();">Sign Up</button>
+                <p>Already have an account? <span id="show-login" class="toggle-link">Log In</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="open-login-btn" class="login-button">Login / Sign Up</button>
+
+
+      
+    <div class="landing-container">
+        <video autoplay loop muted class="background-video">
+            <source src="chatifyvideo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <div class="content">
+            <h1>Welcome to Chatify</h1>
+            <p>Speak easy, connect instantly.</p>
+            <button class="start-chat" onclick="redirectToChat()">Start Chatting</button>
+        </div>
+
+        <div class="emoji-container">
+            <span class="emoji">💬</span>
+            <span class="emoji">😃</span>
+            <span class="emoji">🚀</span>
+            <span class="emoji">💡</span>
+            <span class="emoji">🌍</span>
+        </div>
+    </div>
+
+ 
+    <script src="/js/script.js"></script>
+    <script src="/js/account.js"></script>
+</body>
+</html>
