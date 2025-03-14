@@ -270,6 +270,7 @@ body.light-mode .input-bar input {
 
     .message {
         scroll-behavior: smooth;
+    }
 }
 
 .scroll-down-btn {
