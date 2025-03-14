@@ -7,10 +7,10 @@
 
 body {
     background: linear-gradient(135deg, #0a0a0a, #001f3f);
+    height: 100vh;
     overflow: hidden;
-    position: relative;
     color: white;
-    transition: background 0.3s, color 0.3s;
+    transition: all 0.3s;
 }
 
 /* Particle Animation */
@@ -55,27 +55,36 @@ body {
     background: rgba(0, 255, 255, 0.5);
     transform: scale(1.1);
 }
+/* Light Mode */
 body.light-mode {
     background: #f0f0f0;
     color: #333;
-    transition: background 0.5s, color 0.5s;
 }
 
 body.light-mode .sidebar {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 2px 0 12px rgba(0,0,0,0.1);
 }
 
 body.light-mode .message.sent {
-    background: rgba(0, 123, 255, 0.9);
+    background: #007bff;
     color: white;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
 }
 
 body.light-mode .message.received {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+body.light-mode .input-bar {
+    background: rgba(255,255,255,0.9);
+}
+
+body.light-mode .input-bar input {
+    background: rgba(0,0,0,0.05);
+    color: #333;
+}
 /* Sidebar Styles */
 .sidebar {
     width: 260px;
@@ -183,8 +192,9 @@ body.light-mode .message.received {
 }
 
 .message.received {
-    background: rgba(255, 255, 255, 0.1);
     align-self: flex-start;
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 2px 8px rgba(255,255,255,0.1);
 }
 
 .message:hover {
@@ -198,14 +208,6 @@ body.light-mode .message.received {
     opacity: 0.7;
     margin-top: 6px;
 }
-
-.typing-indicator {
-    color: rgba(0, 255, 255, 0.8);
-    padding: 0 20px;
-    font-style: italic;
-    display: none;
-}
-
 /* Input Area */
 .input-bar {
     padding: 20px;
@@ -214,6 +216,7 @@ body.light-mode .message.received {
     gap: 12px;
     position: sticky;
     bottom: 0;
+    backdrop-filter: blur(10px);  
 }
 
 .input-bar input {
@@ -233,16 +236,17 @@ body.light-mode .message.received {
 }
 
 .input-bar button {
-    padding: 14px 24px;
+    padding: 12px 20px;
     border: none;
     border-radius: 8px;
-    background: rgba(0, 255, 255, 0.3);
+    background: rgba(0,255,255,0.3);
     color: white;
     cursor: pointer;
-    transition: background 0.3s, transform 0.3s;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-
 .input-bar button:hover {
     background: rgba(0, 255, 255, 0.5);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
@@ -265,33 +269,59 @@ body.light-mode .message.received {
     }
 
     .message {
-        max-width: 85%;
-    }
+        scroll-behavior: smooth;
+}
+
+.scroll-down-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+    background: #00ffff;
+    color: #000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,255,255,0.3);
+    transition: 0.3s all;
+    z-index: 1000;
+}
+
+.scroll-down-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,255,255,0.5);
+}
+
+.scroll-down-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Custom Scrollbar */
 .messages::-webkit-scrollbar {
     width: 8px;
-}
-
-.messages::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
 }
 
 .messages::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 255, 0.4);
+    background: rgba(0,255,255,0.4);
     border-radius: 4px;
 }
 
 .messages::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 255, 255, 0.6);
+    background: rgba(0,255,255,0.6);
 }
 
 /* Animated Typing Indicator */
 .typing-indicator {
-    display: flex;
-    align-items: center;
+    display: none;
     gap: 4px;
+    padding: 0 20px;
+    font-style: italic;
+    align-items: center;
 }
 
 .typing-indicator span {
@@ -313,27 +343,6 @@ body.light-mode .message.received {
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-4px); }
-}
-
-/* Light Mode */
-body.light-mode {
-    background: #f0f0f0;
-    color: #333;
-}
-
-body.light-mode .sidebar {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
-}
-
-body.light-mode .message.sent {
-    background: rgba(0, 123, 255, 0.9);
-    color: white;
-}
-
-body.light-mode .message.received {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
 }
 
 /* Floating Action Button (FAB) */
@@ -380,6 +389,17 @@ body.light-mode .message.received {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* Emoji Picker */
+#emoji-picker-container {
+    position: absolute;
+    bottom: 70px;
+    right: 20px;
+    z-index: 1000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
 .notification {
     position: fixed;
     bottom: 20px;
