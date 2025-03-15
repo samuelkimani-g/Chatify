@@ -1,147 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatify</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatify</title>
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-
 <body>
-    <!-- Sidebar Toggle Button -->
-    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
-        <i class="fa-solid fa-bars"></i>
-    </button>
+  <!-- Floating Sidebar Toggle Button -->
+  <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Toggle sidebar">
+    <i class="fa-solid fa-bars"></i>
+  </button>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <nav aria-label="Main navigation">
-            <ul class="sidebar-nav">
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-house-chimney" aria-hidden="true"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        <span>Search</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-comments" aria-hidden="true"></i>
-                        <span>Chat</span>
-                    </a>
-                </li>
-                <!-- In your sidebar -->
-<li>
-    <a href="/games/gamehtml/snake.html" id="game-trigger">
-      <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
-      <span>Chatify Games</span>
-    </a>
-  </li>
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
-                        <span>More</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
-            <ul>
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-user" aria-hidden="true"></i>
-                        <span>Account</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fa-solid fa-cog" aria-hidden="true"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-            </ul>
-            <button id="theme-toggle" aria-label="Toggle theme">
-                <i class="fa-solid fa-moon"></i>
-            </button>
+  <!-- Sidebar with improved structure -->
+  <aside class="sidebar" id="main-sidebar">
+    <header class="sidebar-header">
+      <h2>Chatify</h2>
+    </header>
+    
+    <nav class="sidebar-nav">
+      <ul class="menu">
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="fa-solid fa-house-chimney"></i>
+            <span class="menu-text">Home</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="menu-text">Search</span>
+          </a>
+        </li>
+        <li class="menu-item active">
+          <a href="#" class="menu-link">
+            <i class="fa-solid fa-comments"></i>
+            <span class="menu-text">Chat</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" id="game-trigger">
+            <i class="fa-solid fa-gamepad"></i>
+            <span class="menu-text">Chatify Games</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="fa-solid fa-ellipsis-h"></i>
+            <span class="menu-text">More</span>
+          </a>
+        </li>
+      </ul>
+      <ul class="menu" id="user-list">
+        <!-- Users will be populated here dynamically -->
+      </ul>
+    </nav>
+    <footer class="sidebar-footer">
+      <div class="account-controls">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="profile">
+          <img src="images/user-avatar.png" alt="User Avatar" class="avatar" />
+          <span class="username">Samuel</span>
         </div>
-    </aside>
+      </div>
+    </footer>
+  </aside>
+        <!-- Authentication Overlay -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-modal">
+    <h2>Login to Chatify</h2>
+    <input type="text" id="username" placeholder="Enter your username">
+    <button id="login-btn">Login</button>
+  </div>
+</div>
 
-    <!-- Floating Action Button -->
-    <button class="fab" aria-label="Add something">
-        <i class="fa-solid fa-plus"></i>
-    </button>
 
-    <!-- Chat Container -->
-    <main class="chat-container">
-        <div class="chat-area">
-            <div class="messages" id="messages-container">
-                <div class="message received">
-                    <img src="images/bot-avatar.png" class="avatar" alt="Bot Avatar">
-                    <div class="message-content">
-                        Hello!
-                        <span class="timestamp">10:15 AM</span>
-                    </div>
-                </div>
-                <div class="message sent">
-                    <div class="message-content">
-                        Hey there!
-                        <span class="timestamp">10:16 AM</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Typing Indicator -->
-            <div id="typing-indicator" class="typing-indicator" style="display: none;">
-                <span></span>
-                <span></span>
-                <span></span>
-                Typing...
-            </div>
-            <!-- <div id="loading-spinner" class="loading-spinner">
-                <div class="spinner"></div>
-            </div> -->
-            <div id="notification" class="notification">
-                <span id="notification-text"></span>
-            </div>
-
-            <!-- Input Bar -->
-            <div class="input-bar">
-                <input type="text" id="message-input" placeholder="Type a message...">
-                <button id="emoji-btn" aria-label="Open emoji picker">😀</button>
-                <button id="send-btn">Send</button>
-            </div>
-        </div>
-<!-- Inside your chat-container -->
-<main class="chat-container">
-    <!-- Existing chat area -->
+  <!-- Chat Container with enhanced message handling -->
+  <main class="chat-container">
     <div class="chat-area" id="chat-area">
-      <!-- Messages and input bar here -->
+      <!-- Messages Container with Auto-Scroll -->
+      <div class="messages" id="messages-container">
+        <!-- Messages load here dynamically -->
+      </div>
+
+      <!-- Enhanced Input Bar -->
+      <div class="input-bar">
+        <button class="emoji-btn" aria-label="Open emoji picker">😀</button>
+        <input 
+          type="text" 
+          id="message-input" 
+          placeholder="Type a message..." 
+          autocomplete="off"
+        />
+        <button class="send-btn" id="send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
     </div>
-  
- <!-- New Game Container -->
- <div id="game-container" class="game-container" style="display: none;">
-    <button id="exit-game" class="neon-button">← Back to Chat</button>
+  </main>
+
+  <!-- Game Container (hidden by default) -->
+  <div class="game-container" id="game-container">
+    <button class="game-close-btn" aria-label="Close game">
+      <i class="fa-solid fa-times"></i>
+    </button>
     <canvas id="gameCanvas"></canvas>
     <div class="score-board">Score: <span id="score">0</span></div>
     <div class="game-over-modal" id="gameOverModal">
-        <h2>Game Over!</h2>
-        <p>Press "R" to Restart</p>
+      <h2>Game Over!</h2>
+      <button class="restart-btn">Restart</button>
     </div>
-</div>
-</main>
+  </div>
 
-<!-- Include game scripts -->
-<script src="/games/gamejs/snake.js"></script>
-<!-- Existing scripts -->
-<script src="/js/script.js"></script>
+  <!-- Include main JS file -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

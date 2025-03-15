@@ -46,3 +46,30 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+// Add to your server.js
+const users = {};
+
+io.on('connection', (socket) => {
+  // Authentication middleware
+  socket.on('authenticate', (username) => {
+    socket.username = username;
+    users[socket.id] = username;
+    socket.broadcast.emit('user joined', username);
+  });
+
+  // Private messaging
+  socket.on('private message', (message) => {
+    const recipientSocket = findSocketByUsername(message.to);
+    if (recipientSocket) {
+      socket.to(recipientSocket.id).emit('private message', {
+        content: message.content,
+        from: socket.username,
+        timestamp: message.timestamp
+      });
+    }
+  });
+});
+
+function findSocketByUsername(username) {
+  return Object.entries(users).find(([id, name]) => name === username);
+}
