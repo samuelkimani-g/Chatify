@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -8,37 +7,72 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Users storage
+const users = {};
+const activeUsers = new Set();
+
 // Serve static files
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/games', express.static(path.join(__dirname, 'games')));
 
 // Serve main HTML file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public/html/index.html'));
 });
 
-// Socket.IO chat handling
+// Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('New connection:', socket.id);
 
-  // Handle incoming chat messages
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg); // Broadcast to all clients
+  // Authentication handler
+  socket.on('authenticate', (user) => {
+    users[socket.id] = user;
+    activeUsers.add(user.username);
+    
+    // Send user list to all clients
+    io.emit('user list', Array.from(activeUsers));
+    
+    // Notify others
+    socket.broadcast.emit('user joined', user.username);
   });
 
-  // Handle game state updates
-  socket.on('game update', (state) => {
-    io.emit('game update', state);
+  // Private message handler
+  socket.on('private message', ({ recipient, text }) => {
+    const recipientSocket = findSocketByUsername(recipient);
+    
+    if (recipientSocket) {
+      io.to(recipientSocket).emit('private message', {
+        sender: users[socket.id].username,
+        text,
+        timestamp: new Date().toISOString()
+      });
+    }
   });
 
+  // Disconnect handler
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    if (users[socket.id]) {
+      activeUsers.delete(users[socket.id].username);
+      delete users[socket.id];
+      
+      // Update user list for all clients
+      io.emit('user list', Array.from(activeUsers));
+    }
   });
 });
+
+// Helper function to find user sockets
+function findSocketByUsername(username) {
+  const userEntry = Object.entries(users).find(
+    ([id, user]) => user.username === username
+  );
+  
+  return userEntry ? userEntry[0] : null;
+}
 
 // Error handling
-app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(__dirname, 'public', 'html', '404.html'));
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public/html/404.html'));
 });
 
 // Start server
@@ -46,30 +80,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-// Add to your server.js
-const users = {};
-
-io.on('connection', (socket) => {
-  // Authentication middleware
-  socket.on('authenticate', (username) => {
-    socket.username = username;
-    users[socket.id] = username;
-    socket.broadcast.emit('user joined', username);
-  });
-
-  // Private messaging
-  socket.on('private message', (message) => {
-    const recipientSocket = findSocketByUsername(message.to);
-    if (recipientSocket) {
-      socket.to(recipientSocket.id).emit('private message', {
-        content: message.content,
-        from: socket.username,
-        timestamp: message.timestamp
-      });
-    }
-  });
-});
-
-function findSocketByUsername(username) {
-  return Object.entries(users).find(([id, name]) => name === username);
-}
