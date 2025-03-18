@@ -11,6 +11,7 @@
             align-items: center;
             height: 100vh;
             background: black;
+            margin: 0;
         }
         video {
             width: 80%;
@@ -19,16 +20,39 @@
     </style>
 </head>
 <body>
-    <video id="intro-video" controls autoplay>
-        <source src="intro.mp4" type="video/mp4">
+    <video id="intro-video" autoplay muted playsinline>
+        <source src="/videos/chatifyintro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
     <script>
-        const video = document.getElementById('intro-video');
-        video.onended = () => {
-            window.location.href = "/html/chat.html"; // Redirect to chat after video
-        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const video = document.getElementById("intro-video");
+
+            if (!video) {
+                console.error("❌ Video element not found! Redirecting...");
+                window.location.href = "/html/chat.html";
+                return;
+            }
+
+            // Hide controls immediately
+            video.controls = false;
+
+            // Ensure autoplay works
+            video.play().catch(error => {
+                console.warn("⚠️ Autoplay blocked, redirecting...");
+                window.location.href = "/html/chat.html";
+            });
+
+            // Redirect when video ends (with a slight delay)
+            video.onended = () => setTimeout(() => window.location.href = "/html/chat.html", 500);
+
+            // If the video fails to load, redirect instantly
+            video.onerror = () => {
+                console.error("❌ Video failed to load. Redirecting...");
+                window.location.href = "/html/chat.html";
+            };
+        });
     </script>
 </body>
 </html>

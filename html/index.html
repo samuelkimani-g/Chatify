@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
     <!-- Authentication Modal -->
     <div id="auth-modal" class="modal">
         <div class="modal-content">
@@ -21,15 +22,19 @@
                     <p>Don't have an account? <span id="show-signup" class="toggle-link">Sign Up</span></p>
                 </form>
 
-                <!-- Signup Form (Hidden by default) -->
+                <!-- Signup Form -->
                 <form id="signup-form" style="display: none;">
                     <h2>Create Account</h2>
                     <input type="text" id="signup-username" placeholder="Username" required>
                     <input type="email" id="signup-email" placeholder="Email" required>
-                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <input type="password" id="signup-password" placeholder="Password" required>                    
                     <button type="submit" class="neon-button">Sign Up</button>
                     <p>Already have an account? <span id="show-login" class="toggle-link">Login</span></p>
                 </form>
+
+                <!-- Error message -->
+                <p id="auth-error" style="color: red; display: none;">Server connection error. Please try again.</p>
+                <button id="retry-auth" class="neon-button" style="display: none;">Retry</button>
             </div>
         </div>
     </div>
@@ -60,50 +65,70 @@
         </div>
     </div>
 
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/js/script.js"></script>
     <script src="/js/account.js"></script>
+
     <script>
-        // Modal Toggle
-        document.getElementById('open-login-btn').addEventListener('click', () => {
-            document.getElementById('auth-modal').style.display = 'flex';
-        });
+        document.addEventListener("DOMContentLoaded", async () => {
+            const authModal = document.getElementById("auth-modal");
+            const loginForm = document.getElementById("login-form");
+            const signupForm = document.getElementById("signup-form");
+            const authError = document.getElementById("auth-error");
+            const retryButton = document.getElementById("retry-auth");
 
-        // Form Switching
-        document.getElementById('show-signup').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'block';
-        });
+            document.getElementById("open-login-btn").addEventListener("click", () => {
+                authModal.style.display = "flex";
+            });
 
-        document.getElementById('show-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('signup-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-        });
+            document.getElementById("show-signup").addEventListener("click", (e) => {
+                e.preventDefault();
+                loginForm.style.display = "none";
+                signupForm.style.display = "block";
+            });
 
-        // Authentication Check
-        function redirectToChat() {
-            if (!localStorage.getItem('chatifyUser')) {
-                document.getElementById('signup-form').style.display = 'block';
-                document.getElementById('auth-modal').style.display = 'flex';
-            } else {
-                window.location.href = '/html/chat.html';
-            }
-        }
+            document.getElementById("show-login").addEventListener("click", (e) => {
+                e.preventDefault();
+                signupForm.style.display = "none";
+                loginForm.style.display = "block";
+            });
 
-        // Redirect logic for first-time users
-        (async function() {
-            const response = await fetch('/api/auth/check');
-            if (response.ok) {
-                const firstTime = localStorage.getItem('firstTime');
-                if (!firstTime) {
-                    localStorage.setItem('firstTime', 'true');
-                    window.location.href = "/html/intro.html"; // Redirect to intro video
-                } else {
-                    window.location.href = "/html/chat.html"; // Redirect to chat
+            async function checkAuthAndRedirect() {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout after 5s
+
+                    const response = await fetch("/api/auth/check", { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (response.ok) {
+                        const firstTimeUser = localStorage.getItem("firstTime") === null;
+                        if (firstTimeUser) {
+                            localStorage.setItem("firstTime", "false");
+                            window.location.href = "/html/intro.html";
+                        } else {
+                            window.location.href = "/html/chat.html";
+                        }
+                    } else {
+                        throw new Error("Unauthorized");
+                    }
+                } catch (error) {
+                    console.error("Auth check failed:", error);
+                    authModal.style.display = "flex";
+                    authError.style.display = "block";
+                    retryButton.style.display = "block";
                 }
             }
-        })();
+
+            retryButton.addEventListener("click", () => {
+                authError.style.display = "none";
+                retryButton.style.display = "none";
+                checkAuthAndRedirect();
+            });
+
+            checkAuthAndRedirect();
+        });
     </script>
 </body>
 </html>

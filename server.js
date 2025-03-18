@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Secure password storage
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -11,64 +12,86 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = 'your_secret_key_here';
+const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key_here';
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('html')); // Serve static files from the html folder
+app.use(express.static('public'));
+app.use('/videos', express.static('videos')); // Serve video files
 
 let users = []; // Temporary storage (Replace with DB later)
 
-// ✅ Signup API
-app.post('/api/auth/signup', (req, res) => {
-    const { name, email, password } = req.body;
+// Signup API
+app.post('/api/auth/signup', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
 
-    if (users.find(user => user.email === email)) {
-        return res.status(400).json({ message: 'Email already exists' });
+        if (!name || !email || !password) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+
+        // Check if user already exists
+        if (users.some(user => user.email === email)) {
+            return res.status(400).json({ error: "User already exists." });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash password before storing
+        const user = { id: Date.now(), name, email, password: hashedPassword };
+        users.push(user);
+
+        const token = jwt.sign({ id: user.id, email, name }, SECRET_KEY, { expiresIn: '1h' });
+
+        res.status(201).json({ message: "Signup successful!", token, user: { id: user.id, name, email } });
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
     }
-
-    const token = jwt.sign({ name, email }, SECRET_KEY, { expiresIn: '1h' });
-    users.push({ name, email, password });
-    res.json({ token });
 });
 
-// ✅ Login API
-app.post('/api/auth/login', (req, res) => {
-    const { email } = req.body;
+// Login API
+app.post('/api/auth/login', async (req, res) => {
+    const { email, password } = req.body;
     const user = users.find(user => user.email === email);
 
-    if (!user) {
-        return res.status(401).json({ message: 'User not found' });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ email, name: user.name }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    const token = jwt.sign({ id: user.id, email, name: user.name }, SECRET_KEY, { expiresIn: '1h' });
+
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
 });
 
-// ✅ Authentication Check API
+// Authentication Check API
 app.get('/api/auth/check', (req, res) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'No token provided' });
+    const token = req.headers.authorization?.split(' ')[1];
 
-    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(403).json({ error: "No token provided" });
+    }
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid token' });
-        res.json({ message: 'Authenticated', user });
-    });
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        res.json({ authenticated: true, user: decoded });
+    } catch (err) {
+        res.status(403).json({ error: "Invalid token" });
+    }
 });
 
-// ✅ Get Users API
+// Get Users API
 app.get('/api/users', (req, res) => {
-    res.json(users);
+    res.json(users.map(user => ({ id: user.id, name: user.name, email: user.email }))); // Hide passwords
 });
 
-// ✅ WebSocket Handling
+// WebSocket Handling
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
-    socket.on('private message', (data) => {
-        io.emit('private message', data); // Broadcast message
+    socket.on('private message', ({ senderId, receiverId, message }) => {
+        const recipientSocket = Array.from(io.sockets.sockets.values()).find(s => s.id === receiverId);
+        if (recipientSocket) {
+            recipientSocket.emit('private message', { senderId, message });
+        }
     });
 
     socket.on('typing', (data) => {
@@ -80,4 +103,5 @@ io.on('connection', (socket) => {
     });
 });
 
+// Start Server
 server.listen(PORT, () => console.log(`🔥 Server running on http://localhost:${PORT}`));

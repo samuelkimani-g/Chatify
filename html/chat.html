@@ -41,13 +41,12 @@
             <span class="menu-text">Chat</span>
           </a>
         </li>
-                <li class="menu-item">
+        <li class="menu-item">
           <a href="#" class="menu-link" id="game-trigger">
             <i class="fa-solid fa-gamepad"></i>
             <span class="menu-text">Chatify Games</span>
           </a>
         </li>
-
         <li class="menu-item">
           <a href="#" class="menu-link">
             <i class="fa-solid fa-ellipsis-h"></i>
@@ -61,24 +60,25 @@
     </nav>
     <footer class="sidebar-footer">
       <div class="account-controls">
-        <button class="theme-toggle" aria-label="Toggle theme">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
           <i class="fa-solid fa-moon"></i>
         </button>
         <div class="profile">
-          <img src="images/user-avatar.png" alt="User Avatar" class="avatar" />
-          <span class="username">Samuel</span>
+          <img src="/images/user-avatar.png" alt="User Avatar" class="avatar" />
+          <span class="username" id="username-display">Samuel</span>
         </div>
       </div>
     </footer>
   </aside>
-        <!-- Authentication Overlay -->
-<div id="auth-overlay" class="auth-overlay">
-  <div class="auth-modal">
-    <h2>Login to Chatify</h2>
-    <input type="text" id="username" placeholder="Enter your username">
-    <button id="login-btn">Login</button>
+
+  <!-- Authentication Overlay -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-modal">
+      <h2>Login to Chatify</h2>
+      <input type="text" id="username" placeholder="Enter your username">
+      <button id="login-btn">Login</button>
+    </div>
   </div>
-</div>
 
   <!-- Chat Container with enhanced message handling -->
   <main class="chat-container">
@@ -87,10 +87,9 @@
       <div class="messages" id="messages-container">
         <!-- Messages load here dynamically -->
       </div>
-
       <!-- Enhanced Input Bar -->
       <div class="input-bar">
-        <button class="emoji-btn" aria-label="Open emoji picker">😀</button>
+        <button class="emoji-btn" id="emoji-btn" aria-label="Open emoji picker">😀</button>
         <input 
           type="text" 
           id="message-input" 
@@ -104,27 +103,33 @@
     </div>
   </main>
 
-  <!-- Include main JS file -->
+  <!-- Include main JS files -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/script.js" defer></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!localStorage.getItem('currentUser')) {
-          window.location.href = "/html/index.html"; // Redirect to login
-      }
-    });
+  <script src="/js/account.js"></script>
 
-    (async function() {
-      try {
-        const response = await fetch('/api/auth/check');
-        if (!response.ok) {
-          window.location.href = "/html/index.html"; // Redirect to login if not authenticated
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        window.location.href = "/html/index.html";
-      }
-    })();
+  <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+          async function checkAuth() {
+              const user = localStorage.getItem("currentUser");
+              if (!user) {
+                  window.location.href = "/html/index.html"; // Redirect if no local user
+                  return;
+              }
+              try {
+                  const response = await fetch("/api/auth/check");
+                  if (!response.ok) {
+                      localStorage.removeItem("currentUser"); // Clear invalid session
+                      window.location.href = "/html/index.html";
+                  }
+              } catch (error) {
+                  console.error("Auth check failed:", error);
+                  window.location.href = "/html/index.html";
+              }
+          }
+          await checkAuth();
+      });
   </script>
 </body>
 </html>
