@@ -40,7 +40,7 @@
     <!-- Main Content -->
     <div class="landing-container">
         <video autoplay loop muted class="background-video">
-            <source src="chatifyvideo.mp4" type="video/mp4">
+            <source src="/videos/chatifyvideo.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         
@@ -60,6 +60,8 @@
         </div>
     </div>
 
+    <script src="/js/script.js"></script>
+    <script src="/js/account.js"></script>
     <script>
         // Modal Toggle
         document.getElementById('open-login-btn').addEventListener('click', () => {
@@ -85,12 +87,23 @@
                 document.getElementById('signup-form').style.display = 'block';
                 document.getElementById('auth-modal').style.display = 'flex';
             } else {
-                window.location.href = '/chat.html';
+                window.location.href = '/html/chat.html';
             }
         }
 
-        // Add form submission handlers here
-        // (We'll implement this when you share the CSS/JS files)
+        // Redirect logic for first-time users
+        (async function() {
+            const response = await fetch('/api/auth/check');
+            if (response.ok) {
+                const firstTime = localStorage.getItem('firstTime');
+                if (!firstTime) {
+                    localStorage.setItem('firstTime', 'true');
+                    window.location.href = "/html/intro.html"; // Redirect to intro video
+                } else {
+                    window.location.href = "/html/chat.html"; // Redirect to chat
+                }
+            }
+        })();
     </script>
 </body>
 </html>

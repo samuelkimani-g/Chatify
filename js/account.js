@@ -29,7 +29,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            return await response.json();
+
+            const data = await response.json();
+
+            if (response.ok && data.token) {
+                localStorage.setItem('chatifyToken', data.token);
+
+                if (!localStorage.getItem('firstTime')) {
+                    localStorage.setItem('firstTime', 'true');
+                    window.location.href = "/intro.html"; // First-time intro video
+                } else {
+                    window.location.href = "/chat.html"; // Redirect to chat
+                }
+            } else {
+                alert("Login failed. Please check your credentials.");
+            }
         }
 
         static async signup(name, email, password) {
@@ -38,24 +52,29 @@ document.addEventListener("DOMContentLoaded", async () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })
             });
-            return await response.json();
+
+            const data = await response.json();
+
+            if (response.ok && data.token) {
+                localStorage.setItem('chatifyToken', data.token);
+
+                if (!localStorage.getItem('firstTime')) {
+                    localStorage.setItem('firstTime', 'true');
+                    window.location.href = "/intro.html";
+                } else {
+                    window.location.href = "/chat.html";
+                }
+            } else {
+                alert("Signup failed. Please try again.");
+            }
         }
 
         static async handleLogin(e) {
             e.preventDefault();
             const email = DOM.loginForm.querySelector('#login-email').value;
             const password = DOM.loginForm.querySelector('#login-password').value;
-            
-            try {
-                const { token } = await Auth.login(email, password);
-                if (token) {
-                    localStorage.setItem('chatifyToken', token);
-                    await Auth.showTransitionVideo();
-                    window.location.href = '/chat.html';
-                }
-            } catch (error) {
-                alert('Login failed. Please check your credentials.');
-            }
+
+            await Auth.login(email, password);
         }
 
         static async handleSignup(e) {
@@ -63,17 +82,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const name = DOM.signupForm.querySelector('#signup-name').value;
             const email = DOM.signupForm.querySelector('#signup-email').value;
             const password = DOM.signupForm.querySelector('#signup-password').value;
-            
-            try {
-                const { success } = await Auth.signup(name, email, password);
-                if (success) {
-                    localStorage.setItem('chatifyToken', 'temp_token'); // Temporary token for demo
-                    await Auth.showTransitionVideo();
-                    window.location.href = '/chat.html';
-                }
-            } catch (error) {
-                alert('Signup failed. Please try again.');
-            }
+
+            await Auth.signup(name, email, password);
         }
 
         static async showTransitionVideo() {

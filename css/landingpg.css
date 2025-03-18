@@ -76,18 +76,28 @@ body::before {
 /* Content Styling */
 h1 {
     font-size: 4rem;
-    text-shadow: 0 0 20px #00ffff, 0 0 40px #007bff;
-    background: linear-gradient(45deg, #00ffff, #007bff);
-    -webkit-background-clip: text;
-    color: transparent;
     margin-bottom: 15px;
-    animation: textGlow 2s infinite;
+    color: transparent;
+    background: linear-gradient(45deg, #00ffff, #007bff);
+    -webkit-background-clip: text; /* For Safari/Chrome */
+    background-clip: text;        /* Standard syntax */
+    text-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.7), 
+        0 0 40px rgba(0, 123, 255, 0.5);
+    animation: textGlow 2s infinite linear;
+    position: relative;
+    z-index: 1;
 }
-
 @keyframes textGlow {
     0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #007bff; }
     50% { text-shadow: 0 0 30px #00feba, 0 0 60px #5b548a; }
     100% { text-shadow: 0 0 20px #00ffff, 0 0 40px #007bff; }
+}
+@-moz-document url-prefix() {
+    h1 {
+        background-clip: text;
+        -moz-background-clip: text;
+    }
 }
 
 p {

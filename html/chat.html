@@ -41,12 +41,13 @@
             <span class="menu-text">Chat</span>
           </a>
         </li>
-        <li class="menu-item">
+                <li class="menu-item">
           <a href="#" class="menu-link" id="game-trigger">
             <i class="fa-solid fa-gamepad"></i>
             <span class="menu-text">Chatify Games</span>
           </a>
         </li>
+
         <li class="menu-item">
           <a href="#" class="menu-link">
             <i class="fa-solid fa-ellipsis-h"></i>
@@ -79,7 +80,6 @@
   </div>
 </div>
 
-
   <!-- Chat Container with enhanced message handling -->
   <main class="chat-container">
     <div class="chat-area" id="chat-area">
@@ -104,20 +104,27 @@
     </div>
   </main>
 
-  <!-- Game Container (hidden by default) -->
-  <div class="game-container" id="game-container">
-    <button class="game-close-btn" aria-label="Close game">
-      <i class="fa-solid fa-times"></i>
-    </button>
-    <canvas id="gameCanvas"></canvas>
-    <div class="score-board">Score: <span id="score">0</span></div>
-    <div class="game-over-modal" id="gameOverModal">
-      <h2>Game Over!</h2>
-      <button class="restart-btn">Restart</button>
-    </div>
-  </div>
-
   <!-- Include main JS file -->
-  <script src="/js/script.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/script.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!localStorage.getItem('currentUser')) {
+          window.location.href = "/html/index.html"; // Redirect to login
+      }
+    });
+
+    (async function() {
+      try {
+        const response = await fetch('/api/auth/check');
+        if (!response.ok) {
+          window.location.href = "/html/index.html"; // Redirect to login if not authenticated
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        window.location.href = "/html/index.html";
+      }
+    })();
+  </script>
 </body>
 </html>
